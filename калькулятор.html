@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Годовой калькулятор семейного бюджета</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --text-color: #222;
+      --muted-color: #666;
+      --card-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #cfd6df;
+      --table-border: #e5e9ef;
+      --table-head-bg: #f8fafc;
+      --soft-box-bg: #fafbfd;
+      --soft-box-border: #e5e9ef;
+      --pill-bg: #eef2f7;
+      --pill-text: #555;
+      --empty-text: #777;
+      --chart-text: #555;
+      --chart-grid: #d9e0e8;
+      --chart-center-bg: #fff;
+      --chart-legend-text: #333;
+      --theme-btn-bg: #111827;
+      --theme-btn-hover: #1f2937;
+      --theme-btn-text: #fff;
+    }
+
+    body.dark-theme {
+      --bg-color: #111827;
+      --text-color: #e5e7eb;
+      --muted-color: #9ca3af;
+      --card-bg: #1f2937;
+      --input-bg: #111827;
+      --input-border: #374151;
+      --table-border: #374151;
+      --table-head-bg: #0f172a;
+      --soft-box-bg: #0f172a;
+      --soft-box-border: #374151;
+      --pill-bg: #374151;
+      --pill-text: #d1d5db;
+      --empty-text: #9ca3af;
+      --chart-text: #d1d5db;
+      --chart-grid: #374151;
+      --chart-center-bg: #111827;
+      --chart-legend-text: #f3f4f6;
+      --theme-btn-bg: #e5e7eb;
+      --theme-btn-hover: #cbd5e1;
+      --theme-btn-text: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted-color);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: #4a90e2;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #4a90e2;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #357abd;
+    }
+
+    .btn-secondary {
+      background: #e0e6ed;
+      color: var(--text-color);
+    }
+
+    .btn-secondary:hover {
+      background: #cfd8e3;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-success {
+      background: #27ae60;
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #1f8a4d;
+    }
+
+    .btn-small {
+      padding: 7px 12px;
+      font-size: 13px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .summary-box {
+      padding: 18px;
+      border-radius: 12px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .income-box {
+      background: #27ae60;
+    }
+
+    .expense-box {
+      background: #e67e22;
+    }
+
+    .balance-box {
+      background: #2980b9;
+    }
+
+    .count-box {
+      background: #7f8c8d;
+    }
+
+    .summary-box h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: normal;
+    }
+
+    .summary-box p {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .status.good {
+      background: #dff5e8;
+      color: #1e7e4d;
+      border: 1px solid #bde7cf;
+    }
+
+    .status.bad {
+      background: #fde3e0;
+      color: #b03a2e;
+      border: 1px solid #f5b7b1;
+    }
+
+    .status.neutral {
+      background: #eef2f7;
+      color: var(--pill-text);
+      border: 1px solid #d9e0e8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--table-border);
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--table-head-bg);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .empty-state {
+      color: var(--empty-text);
+      padding: 14px 0;
+      text-align: center;
+    }
+
+    .small-note {
+      margin-top: 12px;
+      color: var(--muted-color);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .pill-income {
+      background: #dff5e8;
+      color: #1e7e4d;
+    }
+
+    .pill-expense {
+      background: #fde9d9;
+      color: #b86a16;
+    }
+
+    .pill-category {
+      background: var(--pill-bg);
+      color: var(--pill-text);
+    }
+
+    .table-wrap {
+      max-height: 520px;
+      overflow: auto;
+      border: 1px solid var(--table-border);
+      border-radius: 10px;
+    }
+
+    .chart-box {
+      background: var(--soft-box-bg);
+      border: 1px solid var(--soft-box-border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: var(--card-bg);
+      border-radius: 10px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--pill-text);
+    }
+
+    .theme-toggle-btn {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: var(--theme-btn-bg);
+      color: var(--theme-btn-text);
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      z-index: 999;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--theme-btn-hover);
+      transform: translateY(-1px);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .editing-banner {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      background: #fff7d6;
+      border: 1px solid #f0d978;
+      border-radius: 10px;
+      color: #7a6400;
+      font-weight: bold;
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .row-2,
+      .row-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .summary-box p {
+        font-size: 24px;
+      }
+
+      th,
+      td {
+        font-size: 13px;
+        padding: 10px 8px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .btn-small {
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Навигация: вернуться на приветственную страницу проекта -->
+    <div style="margin-bottom: 10px;">
+      <a href="./index.html" style="color: inherit; text-decoration: none; font-size: 14px;">
+        ← На главную
+      </a>
+    </div>
+    <h1>Годовой калькулятор семейного бюджета</h1>
+    <p class="subtitle">
+      Добавляйте доходы и расходы в течение года, редактируйте записи, фильтруйте по месяцам
+      и смотрите диаграммы по бюджету.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Добавить или редактировать запись</h2>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="entryType">Тип записи</label>
+            <select id="entryType">
+              <option value="income">Доход</option>
+              <option value="expense">Расход</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="entryDate">Дата</label>
+            <input type="date" id="entryDate" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="entryName">Название</label>
+          <input type="text" id="entryName" placeholder="Например: Зарплата, Продукты, Аренда" />
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="entryAmount">Сумма</label>
+            <input type="number" id="entryAmount" placeholder="Например: 15000" min="0" step="0.01" />
+          </div>
+
+          <div class="field">
+            <label for="entryCategory">Категория</label>
+            <select id="entryCategory">
+              <option value="Зарплата">Зарплата</option>
+              <option value="Подработка">Подработка</option>
+              <option value="Подарки">Подарки</option>
+              <option value="Прочий доход">Прочий доход</option>
+              <option value="Продукты">Продукты</option>
+              <option value="Жильё">Жильё</option>
+              <option value="Коммунальные услуги">Коммунальные услуги</option>
+              <option value="Транспорт">Транспорт</option>
+              <option value="Здоровье">Здоровье</option>
+              <option value="Дети">Дети</option>
+              <option value="Развлечения">Развлечения</option>
+              <option value="Одежда">Одежда</option>
+              <option value="Кредиты">Кредиты</option>
+              <option value="Путешествия">Путешествия</option>
+              <option value="Прочее">Прочее</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="entryComment">Комментарий</label>
+          <input type="text" id="entryComment" placeholder="Необязательно" />
+        </div>
+
+        <div class="editing-banner" id="editingBanner">
+          Сейчас редактируется запись. После изменения нажмите «Сохранить изменения».
+        </div>
+
+        <div class="buttons">
+          <button class="btn-primary" id="saveBtn" onclick="saveEntry()">Добавить запись</button>
+          <button class="btn-secondary" onclick="resetForm()">Очистить форму</button>
+        </div>
+
+        <div class="small-note">
+          Для доходов тоже можно указывать категорию, например: зарплата, премия, подработка.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Фильтр просмотра</h2>
+
+        <div class="row-3">
+          <div class="field">
+            <label for="filterYear">Год</label>
+            <select id="filterYear" onchange="renderAll()"></select>
+          </div>
+
+          <div class="field">
+            <label for="filterMonth">Месяц</label>
+            <select id="filterMonth" onchange="renderAll()">
+              <option value="all">Все месяцы</option>
+              <option value="0">Январь</option>
+              <option value="1">Февраль</option>
+              <option value="2">Март</option>
+              <option value="3">Апрель</option>
+              <option value="4">Май</option>
+              <option value="5">Июнь</option>
+              <option value="6">Июль</option>
+              <option value="7">Август</option>
+              <option value="8">Сентябрь</option>
+              <option value="9">Октябрь</option>
+              <option value="10">Ноябрь</option>
+              <option value="11">Декабрь</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filterType">Тип</label>
+            <select id="filterType" onchange="renderAll()">
+              <option value="all">Все записи</option>
+              <option value="income">Только доходы</option>
+              <option value="expense">Только расходы</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="btn-success" onclick="fillDemoData()">Заполнить пример</button>
+          <button class="btn-danger" onclick="clearAllData()">Очистить всё</button>
+        </div>
+
+        <div class="small-note" id="filterNote">
+          Здесь можно смотреть бюджет за весь год или только за выбранный месяц.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Итоги</h2>
+
+      <div class="summary">
+        <div class="summary-box income-box">
+          <h3>Доходы</h3>
+          <p id="totalIncome">0 ₽</p>
+        </div>
+
+        <div class="summary-box expense-box">
+          <h3>Расходы</h3>
+          <p id="totalExpenses">0 ₽</p>
+        </div>
+
+        <div class="summary-box balance-box">
+          <h3>Баланс</h3>
+          <p id="balance">0 ₽</p>
+        </div>
+
+        <div class="summary-box count-box">
+          <h3>Количество записей</h3>
+          <p id="entriesCount">0</p>
+        </div>
+      </div>
+
+      <div id="budgetStatus" class="status neutral">
+        Добавьте первые записи, чтобы увидеть состояние бюджета.
+      </div>
+
+      <div class="small-note" id="summaryNote">
+        Здесь будет подробная информация по выбранному периоду.
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Диаграмма по месяцам</h2>
+        <div class="chart-box">
+          <canvas id="yearChart" width="900" height="360"></canvas>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-color" style="background:#27ae60;"></span> Доходы</div>
+          <div class="legend-item"><span class="legend-color" style="background:#e67e22;"></span> Расходы</div>
+          <div class="legend-item"><span class="legend-color" style="background:#2980b9;"></span> Баланс</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Диаграмма расходов по категориям</h2>
+        <div class="chart-box">
+          <canvas id="categoryChart" width="900" height="360"></canvas>
+        </div>
+        <div class="small-note" id="categoryNote">
+          Здесь показывается распределение расходов по категориям.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Список операций</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Тип</th>
+              <th>Дата</th>
+              <th>Название</th>
+              <th>Категория</th>
+              <th>Комментарий</th>
+              <th class="text-right">Сумма</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="entriesTableBody">
+            <tr>
+              <td colspan="7" class="empty-state">Записей пока нет</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="small-note">
+        Данные сохраняются в браузере автоматически.
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка переключения темы (правый нижний угол) -->
+  <button
+    id="themeToggleBtn"
+    class="theme-toggle-btn"
+    type="button"
+    title="Переключить тему"
+    aria-label="Переключить тему"
+  >🌙</button>
+
+  <script>
+    /* ==========================================================
+       ГОДОВОЙ КАЛЬКУЛЯТОР СЕМЕЙНОГО БЮДЖЕТА
+       ----------------------------------------------------------
+       Возможности:
+       1. Доходы и расходы в одном списке
+       2. Добавление, редактирование, удаление
+       3. Фильтр по году, месяцу и типу
+       4. Итоги за период
+       5. Диаграмма по месяцам
+       6. Диаграмма расходов по категориям
+       7. Сохранение в localStorage
+       ========================================================== */
+
+    let entries = [];
+    let editingId = null;
+
+    const STORAGE_KEY = "family_budget_year_entries";
+    const THEME_STORAGE_KEY = "family_budget_theme";
+
+    const MONTH_NAMES = [
+      "Янв", "Фев", "Мар", "Апр", "Май", "Июн",
+      "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"
+    ];
+
+    const PIE_COLORS = [
+      "#4a90e2", "#27ae60", "#e67e22", "#9b59b6", "#e74c3c",
+      "#16a085", "#f39c12", "#34495e", "#7f8c8d", "#8e44ad",
+      "#2ecc71", "#d35400"
+    ];
+
+    function applyTheme(themeName) {
+      const isDark = themeName === "dark";
+      document.body.classList.toggle("dark-theme", isDark);
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
+      updateThemeToggleButton();
+    }
+
+    function updateThemeToggleButton() {
+      const button = document.getElementById("themeToggleBtn");
+      if (!button) return;
+      const isDark = document.body.classList.contains("dark-theme");
+      button.textContent = isDark ? "☀️" : "🌙";
+      button.title = isDark ? "Включить светлую тему" : "Включить тёмную тему";
+      button.setAttribute("aria-label", button.title);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.contains("dark-theme");
+      applyTheme(isDark ? "light" : "dark");
+      renderAll();
+    }
+
+    function getCanvasThemeColors() {
+      const styles = getComputedStyle(document.body);
+      return {
+        chartText: styles.getPropertyValue("--chart-text").trim(),
+        chartGrid: styles.getPropertyValue("--chart-grid").trim(),
+        chartCenterBg: styles.getPropertyValue("--chart-center-bg").trim(),
+        chartLegendText: styles.getPropertyValue("--chart-legend-text").trim()
+      };
+    }
+
+    function formatCurrency(amount) {
+      return Number(amount || 0).toLocaleString("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }) + " ₽";
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "—";
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "—";
+      return date.toLocaleDateString("ru-RU");
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function generateId() {
+      return Date.now().toString() + Math.random().toString(16).slice(2);
+    }
+
+    function getTodayString() {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      entries = saved ? JSON.parse(saved) : [];
+    }
+
+    function getAvailableYears() {
+      const currentYear = new Date().getFullYear();
+      const years = entries
+        .map(item => new Date(item.date).getFullYear())
+        .filter(year => !isNaN(year));
+
+      years.push(currentYear);
+
+      const uniqueYears = [...new Set(years)].sort((a, b) => a - b);
+      return uniqueYears;
+    }
+
+    function renderYearOptions() {
+      const select = document.getElementById("filterYear");
+      const currentValue = select.value;
+      const years = getAvailableYears();
+
+      select.innerHTML = years
+        .map(year => `<option value="${year}">${year}</option>`)
+        .join("");
+
+      const currentYear = String(new Date().getFullYear());
+
+      if (years.includes(Number(currentValue))) {
+        select.value = currentValue;
+      } else if (years.includes(Number(currentYear))) {
+        select.value = currentYear;
+      } else if (years.length > 0) {
+        select.value = String(years[years.length - 1]);
+      }
+    }
+
+    function updateCategoryOptionsByType() {
+      const type = document.getElementById("entryType").value;
+      const categorySelect = document.getElementById("entryCategory");
+      const currentValue = categorySelect.value;
+
+      const incomeCategories = [
+        "Зарплата", "Подработка", "Премия", "Подарки", "Пособия", "Прочий доход"
+      ];
+
+      const expenseCategories = [
+        "Продукты", "Жильё", "Коммунальные услуги", "Транспорт", "Здоровье",
+        "Дети", "Развлечения", "Одежда", "Кредиты", "Путешествия", "Прочее"
+      ];
+
+      const list = type === "income" ? incomeCategories : expenseCategories;
+
+      categorySelect.innerHTML = list
+        .map(item => `<option value="${item}">${item}</option>`)
+        .join("");
+
+      if (list.includes(currentValue)) {
+        categorySelect.value = currentValue;
+      }
+    }
+
+    function resetForm() {
+      editingId = null;
+      document.getElementById("entryType").value = "income";
+      document.getElementById("entryDate").value = getTodayString();
+      document.getElementById("entryName").value = "";
+      document.getElementById("entryAmount").value = "";
+      updateCategoryOptionsByType();
+      document.getElementById("entryComment").value = "";
+      document.getElementById("saveBtn").textContent = "Добавить запись";
+      document.getElementById("editingBanner").style.display = "none";
+      document.getElementById("entryName").focus();
+    }
+
+    function saveEntry() {
+      const type = document.getElementById("entryType").value;
+      const date = document.getElementById("entryDate").value;
+      const name = document.getElementById("entryName").value.trim();
+      const amount = Number(document.getElementById("entryAmount").value);
+      const category = document.getElementById("entryCategory").value;
+      const comment = document.getElementById("entryComment").value.trim();
+
+      if (!date) {
+        alert("Укажите дату.");
+        return;
+      }
+
+      if (!name) {
+        alert("Введите название записи.");
+        return;
+      }
+
+      if (!amount || amount <= 0) {
+        alert("Введите корректную сумму.");
+        return;
+      }
+
+      const entry = {
+        id: editingId || generateId(),
+        type,
+        date,
+        name,
+        amount,
+        category,
+        comment
+      };
+
+      if (editingId) {
+        const index = entries.findIndex(item => item.id === editingId);
+        if (index !== -1) {
+          entries[index] = entry;
+        }
+      } else {
+        entries.push(entry);
+      }
+
+      saveData();
+      renderYearOptions();
+      renderAll();
+      resetForm();
+    }
+
+    function editEntry(id) {
+      const item = entries.find(entry => entry.id === id);
+      if (!item) return;
+
+      editingId = id;
+      document.getElementById("entryType").value = item.type;
+      updateCategoryOptionsByType();
+      document.getElementById("entryDate").value = item.date;
+      document.getElementById("entryName").value = item.name;
+      document.getElementById("entryAmount").value = item.amount;
+      document.getElementById("entryCategory").value = item.category;
+      document.getElementById("entryComment").value = item.comment || "";
+      document.getElementById("saveBtn").textContent = "Сохранить изменения";
+      document.getElementById("editingBanner").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteEntry(id) {
+      const confirmed = confirm("Удалить эту запись?");
+      if (!confirmed) return;
+
+      entries = entries.filter(item => item.id !== id);
+      saveData();
+      renderYearOptions();
+      renderAll();
+
+      if (editingId === id) {
+        resetForm();
+      }
+    }
+
+    function clearAllData() {
+      const confirmed = confirm("Удалить все записи?");
+      if (!confirmed) return;
+
+      entries = [];
+      saveData();
+      renderYearOptions();
+      renderAll();
+      resetForm();
+    }
+
+    function getSelectedYear() {
+      return Number(document.getElementById("filterYear").value);
+    }
+
+    function getSelectedMonth() {
+      const value = document.getElementById("filterMonth").value;
+      return value === "all" ? "all" : Number(value);
+    }
+
+    function getSelectedType() {
+      return document.getElementById("filterType").value;
+    }
+
+    function getFilteredEntries() {
+      const year = getSelectedYear();
+      const month = getSelectedMonth();
+      const type = getSelectedType();
+
+      return entries
+        .filter(item => {
+          const date = new Date(item.date);
+          const entryYear = date.getFullYear();
+          const entryMonth = date.getMonth();
+
+          const yearMatch = entryYear === year;
+          const monthMatch = month === "all" ? true : entryMonth === month;
+          const typeMatch = type === "all" ? true : item.type === type;
+
+          return yearMatch && monthMatch && typeMatch;
+        })
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function getEntriesForSelectedYear() {
+      const year = getSelectedYear();
+
+      return entries
+        .filter(item => new Date(item.date).getFullYear() === year)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    function calculateTotals(filteredEntries) {
+      const totalIncome = filteredEntries
+        .filter(item => item.type === "income")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
+
+      const totalExpenses = filteredEntries
+        .filter(item => item.type === "expense")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
+
+      const balance = totalIncome - totalExpenses;
+
+      return {
+        totalIncome,
+        totalExpenses,
+        balance
+      };
+    }
+
+    function renderSummary() {
+      const filteredEntries = getFilteredEntries();
+      const { totalIncome, totalExpenses, balance } = calculateTotals(filteredEntries);
+
+      document.getElementById("totalIncome").textContent = formatCurrency(totalIncome);
+      document.getElementById("totalExpenses").textContent = formatCurrency(totalExpenses);
+      document.getElementById("balance").textContent = formatCurrency(balance);
+      document.getElementById("entriesCount").textContent = filteredEntries.length;
+
+      const status = document.getElementById("budgetStatus");
+      const note = document.getElementById("summaryNote");
+      const month = getSelectedMonth();
+      const year = getSelectedYear();
+
+      let periodText = "за " + year + " год";
+      if (month !== "all") {
+        const monthNamesFull = [
+          "январь", "февраль", "март", "апрель", "май", "июнь",
+          "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
+        ];
+        periodText = "за " + monthNamesFull[month] + " " + year + " года";
+      }
+
+      if (filteredEntries.length === 0) {
+        status.className = "status neutral";
+        status.textContent = "По выбранному периоду записей нет.";
+        note.textContent = "Добавьте записи или измените фильтр, чтобы увидеть статистику " + periodText + ".";
+        return;
+      }
+
+      if (balance > 0) {
+        status.className = "status good";
+        status.textContent = "Бюджет в плюсе " + periodText + ".";
+      } else if (balance < 0) {
+        status.className = "status bad";
+        status.textContent = "Расходы превышают доходы " + periodText + ".";
+      } else {
+        status.className = "status neutral";
+        status.textContent = "Доходы и расходы равны " + periodText + ".";
+      }
+
+      const percent = totalIncome > 0 ? ((totalExpenses / totalIncome) * 100).toFixed(1) : "0.0";
+
+      note.textContent =
+        "Период: " + periodText +
+        ". Доходы: " + formatCurrency(totalIncome) +
+        ". Расходы: " + formatCurrency(totalExpenses) +
+        ". Баланс: " + formatCurrency(balance) +
+        ". Расходы составляют " + percent + "% от доходов.";
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("entriesTableBody");
+      const filteredEntries = getFilteredEntries();
+
+      if (filteredEntries.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-state">По выбранному фильтру записей нет</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filteredEntries.map(item => {
+        const typePill = item.type === "income"
+          ? `<span class="pill pill-income">Доход</span>`
+          : `<span class="pill pill-expense">Расход</span>`;
+
+        return `
+          <tr>
+            <td>${typePill}</td>
+            <td>${formatDate(item.date)}</td>
+            <td>${escapeHtml(item.name)}</td>
+            <td><span class="pill pill-category">${escapeHtml(item.category)}</span></td>
+            <td>${item.comment ? escapeHtml(item.comment) : "—"}</td>
+            <td class="text-right">${formatCurrency(item.amount)}</td>
+            <td>
+              <button class="btn-secondary btn-small" onclick="editEntry('${item.id}')">Редактировать</button>
+              <button class="btn-danger btn-small" onclick="deleteEntry('${item.id}')">Удалить</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderYearChart() {
+      const canvas = document.getElementById("yearChart");
+      const ctx = canvas.getContext("2d");
+      const yearEntries = getEntriesForSelectedYear();
+      const themeColors = getCanvasThemeColors();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const monthlyIncome = Array(12).fill(0);
+      const monthlyExpense = Array(12).fill(0);
+
+      yearEntries.forEach(item => {
+        const month = new Date(item.date).getMonth();
+        if (item.type === "income") {
+          monthlyIncome[month] += Number(item.amount);
+        } else {
+          monthlyExpense[month] += Number(item.amount);
+        }
+      });
+
+      const monthlyBalance = monthlyIncome.map((inc, i) => inc - monthlyExpense[i]);
+      const allValues = [...monthlyIncome, ...monthlyExpense, ...monthlyBalance.map(v => Math.abs(v))];
+      const maxValue = Math.max(...allValues, 1);
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const paddingLeft = 60;
+      const paddingRight = 20;
+      const paddingTop = 25;
+      const paddingBottom = 55;
+
+      const chartW = w - paddingLeft - paddingRight;
+      const chartH = h - paddingTop - paddingBottom;
+      const groupWidth = chartW / 12;
+      const barWidth = groupWidth / 4;
+
+      ctx.font = "12px Arial";
+      ctx.fillStyle = themeColors.chartText;
+      ctx.strokeStyle = themeColors.chartGrid;
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i <= 5; i++) {
+        const y = paddingTop + (chartH / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(w - paddingRight, y);
+        ctx.stroke();
+
+        const value = Math.round(maxValue - (maxValue / 5) * i);
+        ctx.fillText(value.toLocaleString("ru-RU"), 8, y + 4);
+      }
+
+      for (let i = 0; i < 12; i++) {
+        const baseX = paddingLeft + i * groupWidth + groupWidth / 2;
+
+        const incomeHeight = (monthlyIncome[i] / maxValue) * chartH;
+        const expenseHeight = (monthlyExpense[i] / maxValue) * chartH;
+        const balanceValue = Math.abs(monthlyBalance[i]);
+        const balanceHeight = (balanceValue / maxValue) * chartH;
+
+        const x1 = baseX - barWidth * 1.5;
+        const x2 = baseX - barWidth / 2;
+        const x3 = baseX + barWidth / 2;
+
+        ctx.fillStyle = "#27ae60";
+        ctx.fillRect(x1, paddingTop + chartH - incomeHeight, barWidth, incomeHeight);
+
+        ctx.fillStyle = "#e67e22";
+        ctx.fillRect(x2, paddingTop + chartH - expenseHeight, barWidth, expenseHeight);
+
+        ctx.fillStyle = "#2980b9";
+        ctx.fillRect(x3, paddingTop + chartH - balanceHeight, barWidth, balanceHeight);
+
+        ctx.fillStyle = themeColors.chartText;
+        ctx.textAlign = "center";
+        ctx.fillText(MONTH_NAMES[i], baseX, h - 20);
+      }
+
+      ctx.textAlign = "left";
+    }
+
+    function renderCategoryChart() {
+      const canvas = document.getElementById("categoryChart");
+      const ctx = canvas.getContext("2d");
+      const filteredEntries = getFilteredEntries().filter(item => item.type === "expense");
+      const note = document.getElementById("categoryNote");
+      const themeColors = getCanvasThemeColors();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (filteredEntries.length === 0) {
+        ctx.fillStyle = themeColors.chartText;
+        ctx.font = "18px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Нет расходов для построения диаграммы", canvas.width / 2, canvas.height / 2);
+        ctx.textAlign = "left";
+        note.textContent = "Добавьте расходы или измените фильтр периода.";
+        return;
+      }
+
+      const totals = {};
+      filteredEntries.forEach(item => {
+        if (!totals[item.category]) totals[item.category] = 0;
+        totals[item.category] += Number(item.amount);
+      });
+
+      const categories = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      const totalAmount = categories.reduce((sum, item) => sum + item[1], 0);
+
+      const cx = 190;
+      const cy = 180;
+      const radius = 110;
+
+      let startAngle = -Math.PI / 2;
+
+      categories.forEach(([category, value], index) => {
+        const sliceAngle = (value / totalAmount) * Math.PI * 2;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = PIE_COLORS[index % PIE_COLORS.length];
+        ctx.fill();
+
+        startAngle += sliceAngle;
+      });
+
+      ctx.beginPath();
+      ctx.fillStyle = themeColors.chartCenterBg;
+      ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = themeColors.chartText;
+      ctx.font = "bold 16px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Расходы", cx, cy - 8);
+      ctx.font = "14px Arial";
+      ctx.fillText(formatCurrency(totalAmount), cx, cy + 16);
+
+      ctx.textAlign = "left";
+      ctx.font = "13px Arial";
+
+      let legendX = 360;
+      let legendY = 40;
+
+      categories.forEach(([category, value], index) => {
+        const color = PIE_COLORS[index % PIE_COLORS.length];
+        const percent = ((value / totalAmount) * 100).toFixed(1);
+
+        ctx.fillStyle = color;
+        ctx.fillRect(legendX, legendY - 10, 14, 14);
+
+        ctx.fillStyle = themeColors.chartLegendText;
+        ctx.fillText(
+          category + " — " + formatCurrency(value) + " (" + percent + "%)",
+          legendX + 24,
+          legendY + 1
+        );
+
+        legendY += 24;
+      });
+
+      note.textContent =
+        "Показаны расходы по категориям за выбранный период. Всего расходов: " +
+        formatCurrency(totalAmount) + ".";
+    }
+
+    function renderFilterNote() {
+      const month = getSelectedMonth();
+      const year = getSelectedYear();
+      const type = getSelectedType();
+
+      let periodText = month === "all"
+        ? "весь " + year + " год"
+        : MONTH_NAMES[month] + " " + year;
+
+      let typeText = "все записи";
+      if (type === "income") typeText = "только доходы";
+      if (type === "expense") typeText = "только расходы";
+
+      document.getElementById("filterNote").textContent =
+        "Сейчас показываются: " + typeText + ", период: " + periodText + ".";
+    }
+
+    function renderAll() {
+      renderFilterNote();
+      renderSummary();
+      renderTable();
+      renderYearChart();
+      renderCategoryChart();
+    }
+
+    function fillDemoData() {
+      const year = new Date().getFullYear();
+
+      entries = [
+        { id: generateId(), type: "income", date: `${year}-01-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "Основная работа" },
+        { id: generateId(), type: "income", date: `${year}-01-18`, name: "Подработка", amount: 12000, category: "Подработка", comment: "Фриланс" },
+        { id: generateId(), type: "expense", date: `${year}-01-07`, name: "Продукты", amount: 14500, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-01-10`, name: "Аренда квартиры", amount: 30000, category: "Жильё", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-01-14`, name: "Коммунальные услуги", amount: 5500, category: "Коммунальные услуги", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-02-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "income", date: `${year}-02-20`, name: "Премия", amount: 15000, category: "Премия", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-02-06`, name: "Продукты", amount: 15500, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-02-08`, name: "Транспорт", amount: 4200, category: "Транспорт", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-02-11`, name: "Аптека", amount: 2800, category: "Здоровье", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-03-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-03-04`, name: "Продукты", amount: 16200, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-03-10`, name: "Интернет и свет", amount: 6100, category: "Коммунальные услуги", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-03-16`, name: "Одежда", amount: 7400, category: "Одежда", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-04-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "income", date: `${year}-04-22`, name: "Подработка", amount: 9000, category: "Подработка", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-04-09`, name: "Продукты", amount: 15000, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-04-15`, name: "Развлечения", amount: 5000, category: "Развлечения", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-05-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-05-08`, name: "Продукты", amount: 15800, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-05-11`, name: "Поездка", amount: 12000, category: "Путешествия", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-06-05`, name: "Зарплата", amount: 80000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-06-06`, name: "Продукты", amount: 16000, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-06-18`, name: "Лекарства", amount: 3500, category: "Здоровье", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-07-05`, name: "Зарплата", amount: 82000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-07-07`, name: "Продукты", amount: 16600, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-07-20`, name: "Отдых", amount: 18000, category: "Путешествия", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-08-05`, name: "Зарплата", amount: 82000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "income", date: `${year}-08-19`, name: "Подарок", amount: 7000, category: "Подарки", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-08-09`, name: "Продукты", amount: 17000, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-08-15`, name: "Школа", amount: 9600, category: "Дети", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-09-05`, name: "Зарплата", amount: 82000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-09-08`, name: "Продукты", amount: 16300, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-09-10`, name: "Кредит", amount: 11000, category: "Кредиты", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-10-05`, name: "Зарплата", amount: 82000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-10-04`, name: "Продукты", amount: 15900, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-10-14`, name: "Одежда", amount: 8200, category: "Одежда", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-11-05`, name: "Зарплата", amount: 82000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "income", date: `${year}-11-21`, name: "Подработка", amount: 14000, category: "Подработка", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-11-07`, name: "Продукты", amount: 17100, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-11-16`, name: "Развлечения", amount: 6500, category: "Развлечения", comment: "" },
+
+        { id: generateId(), type: "income", date: `${year}-12-05`, name: "Зарплата", amount: 85000, category: "Зарплата", comment: "" },
+        { id: generateId(), type: "income", date: `${year}-12-20`, name: "Премия", amount: 25000, category: "Премия", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-12-09`, name: "Продукты", amount: 18000, category: "Продукты", comment: "" },
+        { id: generateId(), type: "expense", date: `${year}-12-25`, name: "Подарки семье", amount: 22000, category: "Прочее", comment: "" }
+      ];
+
+      saveData();
+      renderYearOptions();
+      renderAll();
+    }
+
+    function setupEvents() {
+      document.getElementById("entryType").addEventListener("change", updateCategoryOptionsByType);
+      document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
+
+      ["entryName", "entryAmount", "entryComment", "entryDate"].forEach(id => {
+        document.getElementById(id).addEventListener("keydown", function(event) {
+          if (event.key === "Enter") {
+            saveEntry();
+          }
+        });
+      });
+    }
+
+    function init() {
+      /* Инициализация темы: восстанавливаем выбор пользователя или системную тему */
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      const systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(savedTheme || (systemPrefersDark ? "dark" : "light"));
+
+      loadData();
+      renderYearOptions();
+      updateCategoryOptionsByType();
+      document.getElementById("entryDate").value = getTodayString();
+      setupEvents();
+      renderAll();
+    }
+
+    init();
+  </script>
+</body>
+</html>

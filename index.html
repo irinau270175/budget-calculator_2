@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Семейный бюджет — старт</title>
+  <meta name="description" content="Простой сайт для ведения семейного бюджета: доходы/расходы, итоги, диаграммы и сохранение в браузере." />
+
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --text-color: #222;
+      --muted-color: #666;
+      --card-bg: #fff;
+      --border: #e5e9ef;
+      --soft: #fafbfd;
+      --btn-primary-bg: #4a90e2;
+      --btn-primary-hover: #357abd;
+      --btn-secondary-bg: #e0e6ed;
+      --btn-secondary-hover: #cfd8e3;
+      --danger-bg: #e74c3c;
+      --danger-hover: #c0392b;
+      --theme-btn-bg: #111827;
+      --theme-btn-hover: #1f2937;
+      --theme-btn-text: #fff;
+    }
+
+    body.dark-theme {
+      --bg-color: #111827;
+      --text-color: #e5e7eb;
+      --muted-color: #9ca3af;
+      --card-bg: #1f2937;
+      --border: #374151;
+      --soft: #0f172a;
+      --btn-primary-bg: #60a5fa;
+      --btn-primary-hover: #3b82f6;
+      --btn-secondary-bg: #334155;
+      --btn-secondary-hover: #475569;
+      --danger-bg: #ef4444;
+      --danger-hover: #dc2626;
+      --theme-btn-bg: #e5e7eb;
+      --theme-btn-hover: #cbd5e1;
+      --theme-btn-text: #111827;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 18px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(39, 174, 96, 0.12));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted-color);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 68ch;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 28px; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 20px;
+    }
+
+    .muted {
+      color: var(--muted-color);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button, a.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      text-decoration: none;
+      transition: 0.2s ease;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--btn-secondary-bg);
+      color: var(--text-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--btn-secondary-hover);
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-hover);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      font-size: 13px;
+      color: var(--muted-color);
+      margin-bottom: 6px;
+    }
+
+    .stat .value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .footer {
+      margin-top: 16px;
+      color: var(--muted-color);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .theme-toggle-btn {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: var(--theme-btn-bg);
+      color: var(--theme-btn-text);
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      z-index: 999;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--theme-btn-hover);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Семейный бюджет</h1>
+      <p>
+        Ведите доходы и расходы, смотрите итоги и диаграммы по году/месяцу.
+        Все данные сохраняются на вашем компьютере в браузере.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Быстрый старт</h2>
+        <div class="muted">
+          Нажмите «Открыть калькулятор», чтобы начать вводить записи.
+          Если записи уже есть — ниже будет краткая сводка по текущему году.
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="./калькулятор.html" aria-label="Открыть калькулятор">
+            Открыть калькулятор
+          </a>
+          <a class="btn btn-secondary" href="./README.md" aria-label="Открыть инструкцию">
+            Инструкция (README)
+          </a>
+          <button id="clearDataBtn" class="btn-danger" type="button" aria-label="Очистить все данные">
+            Очистить данные
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Сводка за текущий год</h2>
+        <div class="muted" id="summaryHint">
+          Сводка формируется по вашим сохранённым данным (если они есть).
+        </div>
+
+        <div class="stats" aria-label="Сводка">
+          <div class="stat">
+            <div class="label">Доходы</div>
+            <div class="value" id="sumIncome">0 ₽</div>
+          </div>
+          <div class="stat">
+            <div class="label">Расходы</div>
+            <div class="value" id="sumExpense">0 ₽</div>
+          </div>
+          <div class="stat">
+            <div class="label">Баланс</div>
+            <div class="value" id="sumBalance">0 ₽</div>
+          </div>
+          <div class="stat">
+            <div class="label">Количество записей</div>
+            <div class="value" id="sumCount">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Что умеет сайт</h2>
+      <div class="muted">
+        - Добавление доходов и расходов в одном списке<br />
+        - Редактирование и удаление записей<br />
+        - Фильтры по году, месяцу и типу записей<br />
+        - Итоги за период и диаграммы<br />
+        - Автосохранение данных в браузере
+      </div>
+    </div>
+
+    <div class="footer">
+      Совет: используйте один браузер для постоянной работы, чтобы данные всегда были на месте.
+      Тему (светлая/тёмная) можно переключать кнопкой в правом нижнем углу.
+    </div>
+  </div>
+
+  <!-- Кнопка переключения темы (правый нижний угол) -->
+  <button
+    id="themeToggleBtn"
+    class="theme-toggle-btn"
+    type="button"
+    title="Переключить тему"
+    aria-label="Переключить тему"
+  >🌙</button>
+
+  <script>
+    const STORAGE_KEY = "family_budget_year_entries";
+    const THEME_STORAGE_KEY = "family_budget_theme";
+
+    function formatCurrency(amount) {
+      return Number(amount || 0).toLocaleString("ru-RU", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }) + " ₽";
+    }
+
+    function applyTheme(themeName) {
+      const isDark = themeName === "dark";
+      document.body.classList.toggle("dark-theme", isDark);
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
+      updateThemeToggleButton();
+    }
+
+    function updateThemeToggleButton() {
+      const button = document.getElementById("themeToggleBtn");
+      if (!button) return;
+      const isDark = document.body.classList.contains("dark-theme");
+      button.textContent = isDark ? "☀️" : "🌙";
+      button.title = isDark ? "Включить светлую тему" : "Включить тёмную тему";
+      button.setAttribute("aria-label", button.title);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.contains("dark-theme");
+      applyTheme(isDark ? "light" : "dark");
+    }
+
+    function safeParseEntries(raw) {
+      try {
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function getCurrentYear() {
+      return new Date().getFullYear();
+    }
+
+    function calcYearSummary(entries, year) {
+      let income = 0;
+      let expense = 0;
+      let count = 0;
+
+      entries.forEach(item => {
+        const d = new Date(item && item.date);
+        if (isNaN(d.getTime())) return;
+        if (d.getFullYear() !== year) return;
+
+        const amount = Number(item.amount || 0);
+        if (!amount) return;
+
+        if (item.type === "income") income += amount;
+        if (item.type === "expense") expense += amount;
+        count += 1;
+      });
+
+      return { income, expense, balance: income - expense, count };
+    }
+
+    function renderSummary() {
+      const year = getCurrentYear();
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const entries = safeParseEntries(raw);
+      const summary = calcYearSummary(entries, year);
+
+      document.getElementById("sumIncome").textContent = formatCurrency(summary.income);
+      document.getElementById("sumExpense").textContent = formatCurrency(summary.expense);
+      document.getElementById("sumBalance").textContent = formatCurrency(summary.balance);
+      document.getElementById("sumCount").textContent = String(summary.count);
+
+      const hint = document.getElementById("summaryHint");
+      if (!entries.length) {
+        hint.textContent = "Пока нет записей. Откройте калькулятор и добавьте первую запись.";
+      } else {
+        hint.textContent = "Показаны итоги за " + year + " год по сохранённым записям.";
+      }
+    }
+
+    function clearAllData() {
+      const ok = confirm("Удалить все записи бюджета в этом браузере?");
+      if (!ok) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderSummary();
+    }
+
+    function init() {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      const systemPrefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(savedTheme || (systemPrefersDark ? "dark" : "light"));
+
+      document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
+      document.getElementById("clearDataBtn").addEventListener("click", clearAllData);
+
+      renderSummary();
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
